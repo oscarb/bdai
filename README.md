@@ -17,18 +17,19 @@ A slim, Gemini-inspired Android app powered by an **on-device AI agent (Gemma 4 
   - **People & Upcoming Sheet** for quick browsing or manual edits.
   - **Settings & Sync Dialog** to configure the local NAS endpoint (`http://<nas-ip>/birthday-calendar/api.php`) and toggle daily birthday push notifications (`WorkManager`).
 
-## Slim `birthdays.txt` Format (Single Source of Truth)
+## Slim `birthdays.yaml` Format (Single Source of Truth)
 - `# Section` headers set the `"friendOf"` group once without repetition.
-- `+Name: YYYY-MM-DD` marks a partner of the person above.
-- `  ChildName: YYYY-MM-DD` (2 spaces indentation) marks a child of the person/couple above.
+- `- Name: YYYY-MM-DD` starts a person/family entry.
+- `  +Name: YYYY-MM-DD` (2 spaces indent) marks a partner of the person above.
+- `  ChildName: YYYY-MM-DD` (2 spaces indent) marks a child of the person/couple above.
 
 ```yaml
-Simon: 1988-04-15
-+Emma: 1990-08-22
+- Simon: 1988-04-15
+  +Emma: 1990-08-22
   Adam: 2018-06-10
   Elsa: 2021-02-14
 
 # Me
-Bob: 1985-11-03
+- Bob: 1985-11-03
   Lucas: 2016-09-19
 ```

@@ -82,23 +82,23 @@ class BirthdayModelsTest {
     }
 
     @Test
-    fun birthdayTxtFormatParsesAndSerializesRoundTripWithPartnerAndTwoSpaces() {
-        val sampleTxt = """
-            Simon: 1988-04-15
-            +Emma: 1990-08-22
+    fun birthdayYamlFormatParsesAndSerializesRoundTripWithPartnerAndTwoSpaces() {
+        val sampleYaml = """
+            - Simon: 1988-04-15
+              +Emma: 1990-08-22
               Adam: 2018-06-10
               Elsa: 2021-02-14
 
             # Me
-            Alex: 1984-03-12
+            - Alex: 1984-03-12
               Leo: 2016-05-04
-            Alex: 1992-07-25
+            - Alex: 1992-07-25
               Nora: 2020-11-18
-            ParentWithoutBirthday:
+            - ParentWithoutBirthday:
               Kid: 2019-01-08
         """.trimIndent() + "\n"
 
-        val parsed = BirthdayTxtFormat.parse(sampleTxt)
+        val parsed = BirthdayYamlFormat.parse(sampleYaml)
         assertEquals(4, parsed.size)
         assertEquals("Simon", parsed[0].name)
         assertEquals("Emma", parsed[0].partner?.name)
@@ -116,7 +116,7 @@ class BirthdayModelsTest {
         assertEquals(null, parsed[3].birthday)
         assertEquals(listOf("Kid"), parsed[3].children.map { it.name })
 
-        val serialized = BirthdayTxtFormat.serialize(parsed)
-        assertEquals(sampleTxt, serialized)
+        val serialized = BirthdayYamlFormat.serialize(parsed)
+        assertEquals(sampleYaml, serialized)
     }
 }

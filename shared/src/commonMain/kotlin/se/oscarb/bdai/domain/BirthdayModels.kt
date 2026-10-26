@@ -30,20 +30,20 @@ data class ChildEntry(
 )
 
 /**
- * Parser and serializer for the canonical 2-space indented `birthdays.txt` format:
+ * Parser and serializer for the canonical 2-space indented `birthdays.yaml` format:
  *
- * ```
- * Simon: 1988-04-15
- * +Emma: 1990-08-22
+ * ```yaml
+ * - Simon: 1988-04-15
+ *   +Emma: 1990-08-22
  *   Adam: 2018-06-10
  *   Elsa: 2021-02-14
  *
  * # Me
- * Bob: 1985-11-03
+ * - Bob: 1985-11-03
  *   Lucas: 2016-09-19
  * ```
  */
-object BirthdayTxtFormat {
+object BirthdayYamlFormat {
 
     fun parse(text: String): List<PersonEntry> {
         val entries = mutableListOf<PersonEntry>()
@@ -61,10 +61,13 @@ object BirthdayTxtFormat {
                 continue
             }
 
-            val isIndented = rawLine.startsWith(" ") || rawLine.startsWith("\t")
-            val colonIndex = trimmed.indexOf(':')
-            val rawName = if (colonIndex >= 0) trimmed.substring(0, colonIndex).trim() else trimmed
-            val rawDate = if (colonIndex >= 0) trimmed.substring(colonIndex + 1).trim() else ""
+            val isListItem = trimmed.startsWith("-")
+            val isIndented = !isListItem && (rawLine.startsWith(" ") || rawLine.startsWith("\t"))
+            val content = if (isListItem) trimmed.removePrefix("-").trim() else trimmed
+
+            val colonIndex = content.indexOf(':')
+            val rawName = if (colonIndex >= 0) content.substring(0, colonIndex).trim() else content
+            val rawDate = if (colonIndex >= 0) content.substring(colonIndex + 1).trim() else ""
 
             if (rawName.startsWith("+")) {
                 val partnerName = rawName.removePrefix("+").trim()
@@ -130,12 +133,12 @@ object BirthdayTxtFormat {
             for (entry in groupEntries) {
                 val name = entry.name.trim()
                 val bday = entry.birthday?.trim().orEmpty()
-                lines += if (bday.isNotEmpty()) "$name: $bday" else "$name:"
+                lines += if (bday.isNotEmpty()) "- $name: $bday" else "- $name:"
 
                 entry.partner?.takeIf { it.name.isNotBlank() }?.let { partner ->
                     val pName = partner.name.trim()
                     val pBday = partner.birthday?.trim().orEmpty()
-                    lines += if (pBday.isNotEmpty()) "+$pName: $pBday" else "+$pName:"
+                    lines += if (pBday.isNotEmpty()) "  +$pName: $pBday" else "  +$pName:"
                 }
 
                 for (child in entry.children) {
@@ -151,6 +154,8 @@ object BirthdayTxtFormat {
         return lines.joinToString("\n") + "\n"
     }
 }
+
+typealias BirthdayTxtFormat = BirthdayYamlFormat
 
 /**
  * Computed view of an individual with a valid birthday (whether top-level, partner, or child),

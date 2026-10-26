@@ -180,7 +180,7 @@ data class FlatBirthdayPerson(
  */
 @Serializable
 data class BdaiSettings(
-    val nasUrl: String = "http://192.168.1.100/birthday-calendar/api.php",
+    val nasUrl: String = "http://192.168.1.13/birthday-calendar/api.php",
     val notificationsEnabled: Boolean = true,
     val notifyDaysBefore: Boolean = true,
     val lastSyncEpochMillis: Long? = null,

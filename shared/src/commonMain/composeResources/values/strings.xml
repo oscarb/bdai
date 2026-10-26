@@ -4,20 +4,20 @@
     <string name="sync_status_synced">Synced with NAS</string>
     <string name="sync_status_pending">Local changes pending sync</string>
 
-    <string name="chat_greeting_title">Hi! Who\'s celebrating soon?</string>
+    <string name="chat_greeting_title">Hi! Who's celebrating soon?</string>
     <string name="chat_greeting_subtitle">Ask me about birthdays, ages, and family connections, or use your voice to add someone.</string>
     <string name="upcoming_soon_card_title">Celebrating within 7 days</string>
     <string name="upcoming_today_badge">🎂 Today! Turns %1$d</string>
     <string name="upcoming_in_days_badge">In %1$d d · Turns %2$d</string>
     <string name="example_prompts_title">Try saying or tapping:</string>
     <string name="example_prompt_1">"Add Emma to the birthday calendar"</string>
-    <string name="example_prompt_2">"How old are Simon\'s kids?"</string>
+    <string name="example_prompt_2">"How old are Simon's kids?"</string>
     <string name="example_prompt_3">"Who has a birthday coming up soon?"</string>
 
     <string name="pill_upcoming_label">🎂 Upcoming birthdays</string>
     <string name="pill_upcoming_prompt">Who has a birthday coming up soon?</string>
-    <string name="pill_kids_label">👨‍👩‍👧‍👦 How old are Simon\'s kids?</string>
-    <string name="pill_kids_prompt">How old are Simon\'s kids?</string>
+    <string name="pill_kids_label">👨‍👩‍👧‍👦 How old are Simon's kids?</string>
+    <string name="pill_kids_prompt">How old are Simon's kids?</string>
     <string name="pill_add_label">➕ Add birthday...</string>
     <string name="pill_add_prefill">Add Emma to the birthday calendar: </string>
     <string name="pill_browse_label">👥 Browse all people</string>
@@ -33,7 +33,7 @@
     <string name="cd_open_settings">Settings and NAS sync</string>
 
     <string name="chat_error_generic">Something went wrong while generating an answer. Please try again.</string>
-    <string name="chat_error_empty_answer">I couldn\'t come up with an answer. Try rephrasing your request.</string>
+    <string name="chat_error_empty_answer">I couldn't come up with an answer. Try rephrasing your request.</string>
 
     <string name="model_setup_title">Set up on-device Gemma 4 E2B</string>
     <string name="model_setup_description">bdai runs %1$s completely offline on your phone. Download once (%2$s) over Wi-Fi to get started.</string>
@@ -42,7 +42,7 @@
     <string name="model_setup_progress">%1$s of %2$s</string>
     <string name="model_setup_loading">Loading AI model into memory…</string>
     <string name="model_setup_download_failed">Download failed. Check your connection and try again.</string>
-    <string name="model_setup_load_failed">The AI model couldn\'t be loaded on this device.</string>
+    <string name="model_setup_load_failed">The AI model couldn't be loaded on this device.</string>
     <string name="model_setup_retry">Try again</string>
 
     <string name="people_sheet_title">People &amp; Birthdays</string>

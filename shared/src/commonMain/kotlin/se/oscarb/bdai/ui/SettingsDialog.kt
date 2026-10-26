@@ -63,7 +63,7 @@ internal fun SettingsDialog(
     state: BdaiChatState,
     onAction: (BdaiAction) -> Unit
 ) {
-    var nasUrlText by remember(state.settings.nasUrl) { mutableStateOf(state.settings.nasUrl) }
+    var nasUrlText by remember { mutableStateOf(state.settings.nasUrl) }
 
     val requestNotificationPermission = rememberNotificationPermissionRequester { granted ->
         onAction(BdaiAction.OnToggleNotifications(granted))

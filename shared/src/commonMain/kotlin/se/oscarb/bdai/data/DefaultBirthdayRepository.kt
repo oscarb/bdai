@@ -394,7 +394,7 @@ class DefaultBirthdayRepository(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            SyncResult.Error(e.message ?: "Failed to sync with NAS")
+            SyncResult.Error("${e.message ?: "Failed to sync"} ($nasUrl)")
         }
     }
 
@@ -408,7 +408,7 @@ class DefaultBirthdayRepository(
         return try {
             val response = httpClient.get(nasUrl)
             if (!response.status.isSuccess()) {
-                return SyncResult.Error("NAS pull failed with HTTP ${response.status.value}")
+                return SyncResult.Error("NAS pull failed with HTTP ${response.status.value} ($nasUrl)")
             }
             val bodyText = response.bodyAsText()
             val parsedEntries = parseNasPayload(bodyText)
@@ -426,7 +426,7 @@ class DefaultBirthdayRepository(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            SyncResult.Error(e.message ?: "Failed to pull from NAS")
+            SyncResult.Error("${e.message ?: "Failed to pull"} ($nasUrl)")
         }
     }
 

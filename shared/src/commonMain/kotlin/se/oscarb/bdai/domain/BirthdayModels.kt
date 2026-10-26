@@ -1,15 +1,12 @@
 package se.oscarb.bdai.domain
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
-import kotlinx.datetime.plus
 import kotlinx.serialization.Serializable
 
 /**
- * Slim, human-editable JSON schema used in `birthdays.json` on the NAS.
- * No UUIDs or clutter—easy to read and edit by hand.
+ * Slim model representing a person/family in `birthdays.txt` on the NAS.
  */
 @Serializable
 data class PersonEntry(
@@ -31,6 +28,129 @@ data class ChildEntry(
     val name: String,
     val birthday: String
 )
+
+/**
+ * Parser and serializer for the canonical 2-space indented `birthdays.txt` format:
+ *
+ * ```
+ * Simon: 1988-04-15
+ * +Emma: 1990-08-22
+ *   Adam: 2018-06-10
+ *   Elsa: 2021-02-14
+ *
+ * # Me
+ * Bob: 1985-11-03
+ *   Lucas: 2016-09-19
+ * ```
+ */
+object BirthdayTxtFormat {
+
+    fun parse(text: String): List<PersonEntry> {
+        val entries = mutableListOf<PersonEntry>()
+        if (text.isBlank()) return entries
+
+        var currentFriendOf: String? = null
+
+        for (rawLine in text.lineSequence()) {
+            val trimmed = rawLine.trim()
+            if (trimmed.isEmpty()) continue
+
+            if (trimmed.startsWith("#")) {
+                val section = trimmed.removePrefix("#").trim()
+                currentFriendOf = section.ifEmpty { null }
+                continue
+            }
+
+            val isIndented = rawLine.startsWith(" ") || rawLine.startsWith("\t")
+            val colonIndex = trimmed.indexOf(':')
+            val rawName = if (colonIndex >= 0) trimmed.substring(0, colonIndex).trim() else trimmed
+            val rawDate = if (colonIndex >= 0) trimmed.substring(colonIndex + 1).trim() else ""
+
+            if (rawName.startsWith("+")) {
+                val partnerName = rawName.removePrefix("+").trim()
+                if (entries.isNotEmpty() && partnerName.isNotEmpty()) {
+                    val lastIdx = entries.lastIndex
+                    entries[lastIdx] = entries[lastIdx].copy(
+                        partner = PartnerEntry(
+                            name = partnerName,
+                            birthday = rawDate.ifEmpty { null }
+                        )
+                    )
+                }
+                continue
+            }
+
+            if (isIndented && entries.isNotEmpty()) {
+                if (rawName.isNotEmpty() && rawDate.isNotEmpty()) {
+                    val lastIdx = entries.lastIndex
+                    val current = entries[lastIdx]
+                    entries[lastIdx] = current.copy(
+                        children = current.children + ChildEntry(
+                            name = rawName,
+                            birthday = rawDate
+                        )
+                    )
+                }
+                continue
+            }
+
+            if (rawName.isNotEmpty()) {
+                entries += PersonEntry(
+                    name = rawName,
+                    birthday = rawDate.ifEmpty { null },
+                    friendOf = currentFriendOf
+                )
+            }
+        }
+
+        return entries
+    }
+
+    fun serialize(entries: List<PersonEntry>): String {
+        if (entries.isEmpty()) return ""
+
+        val orderedGroups = linkedMapOf<String, MutableList<PersonEntry>>()
+        orderedGroups[""] = mutableListOf()
+        for (entry in entries) {
+            if (entry.name.isBlank()) continue
+            val group = entry.friendOf?.trim().orEmpty()
+            orderedGroups.getOrPut(group) { mutableListOf() }.add(entry)
+        }
+
+        val lines = mutableListOf<String>()
+        for ((group, groupEntries) in orderedGroups) {
+            if (groupEntries.isEmpty()) continue
+            if (group.isNotEmpty()) {
+                if (lines.isNotEmpty()) {
+                    lines += ""
+                }
+                lines += "# $group"
+            }
+
+            for (entry in groupEntries) {
+                val name = entry.name.trim()
+                val bday = entry.birthday?.trim().orEmpty()
+                lines += if (bday.isNotEmpty()) "$name: $bday" else "$name:"
+
+                entry.partner?.takeIf { it.name.isNotBlank() }?.let { partner ->
+                    val pName = partner.name.trim()
+                    val pBday = partner.birthday?.trim().orEmpty()
+                    lines += if (pBday.isNotEmpty()) "+$pName: $pBday" else "+$pName:"
+                }
+
+                for (child in entry.children) {
+                    if (child.name.isNotBlank()) {
+                        val cName = child.name.trim()
+                        val cBday = child.birthday.trim()
+                        lines += if (cBday.isNotEmpty()) "  $cName: $cBday" else "  $cName:"
+                    }
+                }
+            }
+        }
+
+        return lines.joinToString("\n") + "\n"
+    }
+}
 
 /**
  * Computed view of an individual with a valid birthday (whether top-level, partner, or child),

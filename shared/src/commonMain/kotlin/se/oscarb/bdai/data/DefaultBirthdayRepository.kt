@@ -25,6 +25,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import se.oscarb.bdai.domain.BdaiSettings
 import se.oscarb.bdai.domain.BirthdayRepository
+import se.oscarb.bdai.domain.BirthdayTxtFormat
 import se.oscarb.bdai.domain.ChildEntry
 import se.oscarb.bdai.domain.PartnerEntry
 import se.oscarb.bdai.domain.PersonEntry
@@ -430,7 +431,12 @@ class DefaultBirthdayRepository(
     }
 
     internal fun parseNasPayload(bodyText: String): List<PersonEntry> {
-        val element = json.parseToJsonElement(bodyText)
+        val trimmed = bodyText.trim()
+        if (trimmed.isEmpty()) return emptyList()
+        if (!trimmed.startsWith("[") && !trimmed.startsWith("{")) {
+            return BirthdayTxtFormat.parse(trimmed)
+        }
+        val element = json.parseToJsonElement(trimmed)
         val listSerializer = ListSerializer(PersonEntry.serializer())
         return when (element) {
             is JsonArray -> json.decodeFromJsonElement(listSerializer, element)
@@ -439,7 +445,7 @@ class DefaultBirthdayRepository(
                     ?: throw IllegalArgumentException("Missing 'entries' array in NAS response")
                 json.decodeFromJsonElement(listSerializer, array)
             }
-            else -> throw IllegalArgumentException("Unexpected JSON format from NAS")
+            else -> throw IllegalArgumentException("Unexpected format from NAS")
         }
     }
 

@@ -80,4 +80,43 @@ class BirthdayModelsTest {
         assertEquals(5, viktor.ageNow)
         assertEquals(6, viktor.turningAge)
     }
+
+    @Test
+    fun birthdayTxtFormatParsesAndSerializesRoundTripWithPartnerAndTwoSpaces() {
+        val sampleTxt = """
+            Simon: 1988-04-15
+            +Emma: 1990-08-22
+              Adam: 2018-06-10
+              Elsa: 2021-02-14
+
+            # Me
+            Alex: 1984-03-12
+              Leo: 2016-05-04
+            Alex: 1992-07-25
+              Nora: 2020-11-18
+            ParentWithoutBirthday:
+              Kid: 2019-01-08
+        """.trimIndent() + "\n"
+
+        val parsed = BirthdayTxtFormat.parse(sampleTxt)
+        assertEquals(4, parsed.size)
+        assertEquals("Simon", parsed[0].name)
+        assertEquals("Emma", parsed[0].partner?.name)
+        assertEquals("1990-08-22", parsed[0].partner?.birthday)
+        assertEquals(listOf("Adam", "Elsa"), parsed[0].children.map { it.name })
+
+        assertEquals("Me", parsed[1].friendOf)
+        assertEquals("1984-03-12", parsed[1].birthday)
+        assertEquals(listOf("Leo"), parsed[1].children.map { it.name })
+
+        assertEquals("Me", parsed[2].friendOf)
+        assertEquals("1992-07-25", parsed[2].birthday)
+        assertEquals(listOf("Nora"), parsed[2].children.map { it.name })
+
+        assertEquals(null, parsed[3].birthday)
+        assertEquals(listOf("Kid"), parsed[3].children.map { it.name })
+
+        val serialized = BirthdayTxtFormat.serialize(parsed)
+        assertEquals(sampleTxt, serialized)
+    }
 }

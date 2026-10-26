@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">bdai</string>
+    <string name="notif_channel_name">Birthday Reminders</string>
+    <string name="notif_channel_desc">Daily notifications for birthdays today and in 7 days</string>
+    <string name="notif_today_title">🎂 %1$s turns %2$d today!</string>
+    <string name="notif_today_body">Don\'t forget to wish %1$s a happy birthday!</string>
+    <string name="notif_upcoming_title">🎂 %1$s turns %2$d in 7 days</string>
+    <string name="notif_upcoming_body">Birthday coming up on %1$s.</string>
+</resources>

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">bdai</string>
+    <string name="notif_channel_name">Födelsedagspåminnelser</string>
+    <string name="notif_channel_desc">Dagliga påminnelser om födelsedagar idag och om 7 dagar</string>
+    <string name="notif_today_title">🎂 %1$s fyller %2$d år idag!</string>
+    <string name="notif_today_body">Glöm inte att gratulera %1$s på födelsedagen!</string>
+    <string name="notif_upcoming_title">🎂 %1$s fyller %2$d år om 7 dagar</string>
+    <string name="notif_upcoming_body">Fyller år den %1$s.</string>
+</resources>

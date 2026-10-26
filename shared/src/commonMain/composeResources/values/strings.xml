@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">bdai</string>
+    <string name="chat_subtitle">On-device Birthday AI</string>
+    <string name="sync_status_synced">Synced with NAS</string>
+    <string name="sync_status_pending">Local changes pending sync</string>
+
+    <string name="chat_greeting_title">Hi! Who\'s celebrating soon?</string>
+    <string name="chat_greeting_subtitle">Ask me about birthdays, ages, and family connections, or use your voice to add someone.</string>
+    <string name="upcoming_soon_card_title">Celebrating within 7 days</string>
+    <string name="upcoming_today_badge">🎂 Today! Turns %1$d</string>
+    <string name="upcoming_in_days_badge">In %1$d d · Turns %2$d</string>
+    <string name="example_prompts_title">Try saying or tapping:</string>
+    <string name="example_prompt_1">"Add Emma to the birthday calendar"</string>
+    <string name="example_prompt_2">"How old are Simon\'s kids?"</string>
+    <string name="example_prompt_3">"Who has a birthday coming up soon?"</string>
+
+    <string name="pill_upcoming_label">🎂 Upcoming birthdays</string>
+    <string name="pill_upcoming_prompt">Who has a birthday coming up soon?</string>
+    <string name="pill_kids_label">👨‍👩‍👧‍👦 How old are Simon\'s kids?</string>
+    <string name="pill_kids_prompt">How old are Simon\'s kids?</string>
+    <string name="pill_add_label">➕ Add birthday...</string>
+    <string name="pill_add_prefill">Add Emma to the birthday calendar: </string>
+    <string name="pill_browse_label">👥 Browse all people</string>
+
+    <string name="chat_input_placeholder">Ask or tell bdai…</string>
+    <string name="voice_listening_placeholder">Listening… speak now</string>
+    <string name="voice_permission_denied">Microphone permission is required for voice input.</string>
+    <string name="cd_voice_input">Voice input</string>
+    <string name="cd_stop_listening">Stop listening</string>
+    <string name="cd_send_message">Send message</string>
+    <string name="cd_new_chat">Start a new chat</string>
+    <string name="cd_open_people">People and upcoming birthdays</string>
+    <string name="cd_open_settings">Settings and NAS sync</string>
+
+    <string name="chat_error_generic">Something went wrong while generating an answer. Please try again.</string>
+    <string name="chat_error_empty_answer">I couldn\'t come up with an answer. Try rephrasing your request.</string>
+
+    <string name="model_setup_title">Set up on-device Gemma 4 E2B</string>
+    <string name="model_setup_description">bdai runs %1$s completely offline on your phone. Download once (%2$s) over Wi-Fi to get started.</string>
+    <string name="model_setup_download">Download model (%1$s)</string>
+    <string name="model_setup_downloading">Downloading %1$s…</string>
+    <string name="model_setup_progress">%1$s of %2$s</string>
+    <string name="model_setup_loading">Loading AI model into memory…</string>
+    <string name="model_setup_download_failed">Download failed. Check your connection and try again.</string>
+    <string name="model_setup_load_failed">The AI model couldn\'t be loaded on this device.</string>
+    <string name="model_setup_retry">Try again</string>
+
+    <string name="people_sheet_title">People &amp; Birthdays</string>
+    <string name="people_sheet_subtitle">%1$d birthdays tracked</string>
+    <string name="people_filter_upcoming">Upcoming</string>
+    <string name="people_filter_families">By Family &amp; Friends</string>
+    <string name="people_sync_nas">Sync with NAS</string>
+    <string name="people_add_person">Add person</string>
+    <string name="people_empty_state">No birthdays yet. Ask bdai or tap + to add someone!</string>
+    <string name="person_age_turning">%1$d yrs · Turns %2$d on %3$s</string>
+    <string name="person_days_today">🎂 Today!</string>
+    <string name="person_days_tomorrow">Tomorrow</string>
+    <string name="person_days_until">In %1$d d</string>
+    <string name="person_friend_of">Friend of %1$s</string>
+    <string name="person_partner_label">Partner: %1$s</string>
+    <string name="person_parents_label">Parents: %1$s</string>
+    <string name="person_children_label">Children: %1$s</string>
+    <string name="person_no_birthday">Birthday not set</string>
+
+    <string name="person_form_add_title">Add / Edit Person</string>
+    <string name="person_form_name">Name (e.g. Emma)</string>
+    <string name="person_form_birthday">Birthday (YYYY-MM-DD)</string>
+    <string name="person_form_friend_of">Friend of (e.g. Simon)</string>
+    <string name="person_form_partner_name">Partner name (optional)</string>
+    <string name="person_form_partner_birthday">Partner birthday (YYYY-MM-DD)</string>
+    <string name="person_form_save">Save</string>
+    <string name="person_form_cancel">Cancel</string>
+    <string name="cd_delete_person">Delete person</string>
+
+    <string name="settings_title">Settings &amp; Sync</string>
+    <string name="settings_nas_section">Synology NAS Synchronization</string>
+    <string name="settings_nas_url_label">NAS API URL</string>
+    <string name="settings_nas_url_placeholder">http://192.168.1.100/birthday-calendar/api.php</string>
+    <string name="settings_sync_to_nas">Sync to NAS</string>
+    <string name="settings_pull_from_nas">Pull from NAS</string>
+    <string name="settings_sync_success">Synced %1$d entries with NAS!</string>
+    <string name="settings_sync_error">Sync failed: %1$s</string>
+    <string name="settings_notifications_section">Notifications</string>
+    <string name="settings_notifications_enable">Birthday push notifications</string>
+    <string name="settings_notifications_7days">Also notify 7 days before</string>
+    <string name="settings_notifications_test">Check &amp; test notifications now</string>
+    <string name="settings_model_section">On-Device AI Model (Gemma 4 E2B)</string>
+    <string name="settings_model_ready">Ready · Running on-device</string>
+    <string name="settings_model_not_downloaded">Not downloaded yet</string>
+    <string name="settings_model_downloading">Downloading (%1$d%%)</string>
+    <string name="settings_model_loading">Loading into memory…</string>
+    <string name="settings_model_failed">Error: %1$s</string>
+    <string name="settings_close">Done</string>
+</resources>

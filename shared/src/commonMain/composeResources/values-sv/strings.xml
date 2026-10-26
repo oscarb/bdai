@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">bdai</string>
+    <string name="chat_subtitle">Födelsedags-AI på enheten</string>
+    <string name="sync_status_synced">Synkad med NAS</string>
+    <string name="sync_status_pending">Lokala ändringar väntar på synk</string>
+
+    <string name="chat_greeting_title">Hej! Vad vill du veta eller ändra?</string>
+    <string name="chat_greeting_subtitle">Fråga mig om födelsedagar, åldrar och familjer, eller lägg till någon med rösten.</string>
+    <string name="upcoming_soon_card_title">Fyller år inom 7 dagar</string>
+    <string name="upcoming_today_badge">🎂 Idag! Fyller %1$d år</string>
+    <string name="upcoming_in_days_badge">Om %1$d d · Fyller %2$d år</string>
+    <string name="example_prompts_title">Prova att säga eller trycka på:</string>
+    <string name="example_prompt_1">"Lägg till Emma i födelsedagskalendern"</string>
+    <string name="example_prompt_2">"Hur gamla är Simons barn?"</string>
+    <string name="example_prompt_3">"Vem fyller år snart?"</string>
+
+    <string name="pill_upcoming_label">🎂 Kommande födelsedagar</string>
+    <string name="pill_upcoming_prompt">Vem fyller år snart?</string>
+    <string name="pill_kids_label">👨‍👩‍👧‍👦 Hur gamla är Simons barn?</string>
+    <string name="pill_kids_prompt">Hur gamla är Simons barn?</string>
+    <string name="pill_add_label">➕ Lägg till födelsedag...</string>
+    <string name="pill_add_prefill">Lägg till Emma i födelsedagskalendern: </string>
+    <string name="pill_browse_label">👥 Visa alla personer</string>
+
+    <string name="chat_input_placeholder">Fråga eller säg något till bdai…</string>
+    <string name="voice_listening_placeholder">Lyssnar… prata nu</string>
+    <string name="voice_permission_denied">Mikrofonbehörighet krävs för röstinmatning.</string>
+    <string name="cd_voice_input">Röstinmatning</string>
+    <string name="cd_stop_listening">Sluta lyssna</string>
+    <string name="cd_send_message">Skicka meddelande</string>
+    <string name="cd_new_chat">Starta ny chatt</string>
+    <string name="cd_open_people">Personer och kommande födelsedagar</string>
+    <string name="cd_open_settings">Inställningar och NAS-synk</string>
+
+    <string name="chat_error_generic">Något gick fel när svaret skulle skapas. Försök igen.</string>
+    <string name="chat_error_empty_answer">Jag kunde inte få fram ett svar. Försök formulera om frågan.</string>
+
+    <string name="model_setup_title">Installera Gemma 4 E2B på enheten</string>
+    <string name="model_setup_description">bdai kör %1$s helt lokalt på telefonen. Ladda ner en gång (%2$s) via Wi-Fi för att komma igång.</string>
+    <string name="model_setup_download">Ladda ner modell (%1$s)</string>
+    <string name="model_setup_downloading">Laddar ner %1$s…</string>
+    <string name="model_setup_progress">%1$s av %2$s</string>
+    <string name="model_setup_loading">Laddar in AI-modellen i minnet…</string>
+    <string name="model_setup_download_failed">Nedladdningen misslyckades. Kontrollera anslutningen och försök igen.</string>
+    <string name="model_setup_load_failed">AI-modellen kunde inte laddas på den här enheten.</string>
+    <string name="model_setup_retry">Försök igen</string>
+
+    <string name="people_sheet_title">Personer &amp; födelsedagar</string>
+    <string name="people_sheet_subtitle">%1$d födelsedagar sparade</string>
+    <string name="people_filter_upcoming">Kommande</string>
+    <string name="people_filter_families">Familj &amp; vänner</string>
+    <string name="people_sync_nas">Synka med NAS</string>
+    <string name="people_add_person">Lägg till person</string>
+    <string name="people_empty_state">Inga födelsedagar ännu. Fråga bdai eller tryck på + för att lägga till någon!</string>
+    <string name="person_age_turning">%1$d år · Fyller %2$d år %3$s</string>
+    <string name="person_days_today">🎂 Idag!</string>
+    <string name="person_days_tomorrow">Imorgon</string>
+    <string name="person_days_until">Om %1$d d</string>
+    <string name="person_friend_of">Vän till %1$s</string>
+    <string name="person_partner_label">Partner: %1$s</string>
+    <string name="person_parents_label">Föräldrar: %1$s</string>
+    <string name="person_children_label">Barn: %1$s</string>
+    <string name="person_no_birthday">Födelsedag saknas</string>
+
+    <string name="person_form_add_title">Lägg till / redigera person</string>
+    <string name="person_form_name">Namn (t.ex. Emma)</string>
+    <string name="person_form_birthday">Födelsedag (ÅÅÅÅ-MM-DD)</string>
+    <string name="person_form_friend_of">Vän till (t.ex. Simon)</string>
+    <string name="person_form_partner_name">Partners namn (valfritt)</string>
+    <string name="person_form_partner_birthday">Partners födelsedag (ÅÅÅÅ-MM-DD)</string>
+    <string name="person_form_save">Spara</string>
+    <string name="person_form_cancel">Avbryt</string>
+    <string name="cd_delete_person">Ta bort person</string>
+
+    <string name="settings_title">Inställningar &amp; synk</string>
+    <string name="settings_nas_section">Synology NAS-synkronisering</string>
+    <string name="settings_nas_url_label">NAS API-adress</string>
+    <string name="settings_nas_url_placeholder">http://192.168.1.100/birthday-calendar/api.php</string>
+    <string name="settings_sync_to_nas">Synka till NAS</string>
+    <string name="settings_pull_from_nas">Hämta från NAS</string>
+    <string name="settings_sync_success">Synkade %1$d poster med NAS!</string>
+    <string name="settings_sync_error">Synkfel: %1$s</string>
+    <string name="settings_notifications_section">Aviseringar</string>
+    <string name="settings_notifications_enable">Push-notiser för födelsedagar</string>
+    <string name="settings_notifications_7days">Påminn även 7 dagar innan</string>
+    <string name="settings_notifications_test">Testa födelsedagsnotis nu</string>
+    <string name="settings_model_section">Lokal AI-modell (Gemma 4 E2B)</string>
+    <string name="settings_model_ready">Redo · Körs lokalt på enheten</string>
+    <string name="settings_model_not_downloaded">Inte nedladdad ännu</string>
+    <string name="settings_model_downloading">Laddar ner (%1$d%%)</string>
+    <string name="settings_model_loading">Laddar in i minnet…</string>
+    <string name="settings_model_failed">Fel: %1$s</string>
+    <string name="settings_close">Klar</string>
+</resources>

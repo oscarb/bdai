@@ -18,3 +18,9 @@ expect fun currentLocalDate(): LocalDate
  */
 @Composable
 expect fun rememberNotificationPermissionRequester(onResult: (Boolean) -> Unit): () -> Unit
+
+/**
+ * Returns a lambda that checks/requests ACCESS_LOCAL_NETWORK permission on Android 17+ (API 37+) and invokes [onResult].
+ */
+@Composable
+expect fun rememberLocalNetworkPermissionRequester(onResult: (Boolean) -> Unit): () -> Unit

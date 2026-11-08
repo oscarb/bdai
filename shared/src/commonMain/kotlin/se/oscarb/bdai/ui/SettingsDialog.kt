@@ -56,6 +56,7 @@ import bdai.shared.generated.resources.settings_title
 import org.jetbrains.compose.resources.stringResource
 import se.oscarb.bdai.agent.domain.ModelState
 import se.oscarb.bdai.core.designsystem.AppIcons
+import se.oscarb.bdai.notifications.rememberLocalNetworkPermissionRequester
 import se.oscarb.bdai.notifications.rememberNotificationPermissionRequester
 
 @Composable
@@ -67,6 +68,18 @@ internal fun SettingsDialog(
 
     val requestNotificationPermission = rememberNotificationPermissionRequester { granted ->
         onAction(BdaiAction.OnToggleNotifications(granted))
+    }
+
+    val requestSyncPermission = rememberLocalNetworkPermissionRequester { granted ->
+        if (granted) {
+            onAction(BdaiAction.OnSyncWithNasClick)
+        }
+    }
+
+    val requestPullPermission = rememberLocalNetworkPermissionRequester { granted ->
+        if (granted) {
+            onAction(BdaiAction.OnPullFromNasClick)
+        }
     }
 
     AlertDialog(
@@ -122,7 +135,7 @@ internal fun SettingsDialog(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { onAction(BdaiAction.OnSyncWithNasClick) },
+                        onClick = { requestSyncPermission() },
                         enabled = !state.isSyncing,
                         modifier = Modifier.weight(1f)
                     ) {
@@ -136,7 +149,7 @@ internal fun SettingsDialog(
                         }
                     }
                     OutlinedButton(
-                        onClick = { onAction(BdaiAction.OnPullFromNasClick) },
+                        onClick = { requestPullPermission() },
                         enabled = !state.isSyncing,
                         modifier = Modifier.weight(1f)
                     ) {

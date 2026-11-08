@@ -38,6 +38,8 @@ actual fun currentLocalDate(): LocalDate {
     return LocalDate(now.year, now.monthValue, now.dayOfMonth)
 }
 
+private const val PERMISSION_ACCESS_LOCAL_NETWORK = "android.permission.ACCESS_LOCAL_NETWORK"
+
 @Composable
 actual fun rememberNotificationPermissionRequester(onResult: (Boolean) -> Unit): () -> Unit {
     val context = LocalContext.current
@@ -62,6 +64,40 @@ actual fun rememberNotificationPermissionRequester(onResult: (Boolean) -> Unit):
                                 activity,
                                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                                 1002
+                            )
+                        }
+                        onResult(false)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+actual fun rememberLocalNetworkPermissionRequester(onResult: (Boolean) -> Unit): () -> Unit {
+    val context = LocalContext.current
+    return remember(context, onResult) {
+        {
+            if (Build.VERSION.SDK_INT < 37) {
+                onResult(true)
+            } else {
+                val granted = ContextCompat.checkSelfPermission(
+                    context,
+                    PERMISSION_ACCESS_LOCAL_NETWORK
+                ) == PackageManager.PERMISSION_GRANTED
+                if (granted) {
+                    onResult(true)
+                } else {
+                    val handler = AndroidPermissionBridge.requestPermissionHandler
+                    if (handler != null) {
+                        handler(PERMISSION_ACCESS_LOCAL_NETWORK, onResult)
+                    } else {
+                        (context as? Activity)?.let { activity ->
+                            ActivityCompat.requestPermissions(
+                                activity,
+                                arrayOf(PERMISSION_ACCESS_LOCAL_NETWORK),
+                                1003
                             )
                         }
                         onResult(false)

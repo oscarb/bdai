@@ -171,16 +171,49 @@ class DefaultBirthdayRepository(
                     partner = updatedPartner
                 ).also { current[targetIndex] = it }
             } else {
-                val partner = normalizedPartnerName?.let {
-                    PartnerEntry(name = it, birthday = normalizedPartnerBirthday)
+                // If no top-level person matched, check if a single existing partner or child matches when updating a birthday
+                val matchingPartnerIndices = if (normalizedBirthday != null && normalizedPartnerName == null) {
+                    current.mapIndexedNotNull { pIdx, entry ->
+                        pIdx.takeIf { entry.partner?.name?.equals(trimmedName, ignoreCase = true) == true }
+                    }
+                } else {
+                    emptyList()
                 }
-                PersonEntry(
-                    name = trimmedName,
-                    birthday = normalizedBirthday,
-                    friendOf = normalizedFriendOf,
-                    partner = partner,
-                    children = emptyList()
-                ).also { current.add(it) }
+
+                val matchingChildLocations = if (normalizedBirthday != null && normalizedPartnerName == null) {
+                    current.flatMapIndexed { pIdx, entry ->
+                        entry.children.mapIndexedNotNull { cIdx, child ->
+                            (pIdx to cIdx).takeIf { child.name.equals(trimmedName, ignoreCase = true) }
+                        }
+                    }
+                } else {
+                    emptyList()
+                }
+
+                if (matchingPartnerIndices.size == 1 && normalizedBirthday != null) {
+                    val parentIdx = matchingPartnerIndices.single()
+                    val parent = current[parentIdx]
+                    val existingPartner = parent.partner!!
+                    parent.copy(partner = existingPartner.copy(birthday = normalizedBirthday))
+                        .also { current[parentIdx] = it }
+                } else if (matchingChildLocations.size == 1 && normalizedBirthday != null) {
+                    val (parentIdx, childIdx) = matchingChildLocations.single()
+                    val parent = current[parentIdx]
+                    val updatedChildren = parent.children.toMutableList()
+                    updatedChildren[childIdx] = updatedChildren[childIdx].copy(birthday = normalizedBirthday)
+                    parent.copy(children = updatedChildren).also { current[parentIdx] = it }
+                } else {
+                    val partner = normalizedPartnerName?.let {
+                        PartnerEntry(name = it, birthday = normalizedPartnerBirthday)
+                    }
+                    PersonEntry(
+                        name = trimmedName,
+                        birthday = normalizedBirthday,
+                        friendOf = normalizedFriendOf,
+                        partner = partner,
+                        children = emptyList()
+                    ).also { current.add(it) }
+                }
             }
 
             val updatedSettings = _settings.value.copy(hasPendingLocalChanges = true)

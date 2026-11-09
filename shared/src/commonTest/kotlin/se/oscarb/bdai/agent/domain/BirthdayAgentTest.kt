@@ -8,6 +8,7 @@ import se.oscarb.bdai.data.DefaultBirthdayRepository
 import se.oscarb.bdai.data.SampleBirthdays
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Clock
@@ -71,6 +72,68 @@ class BirthdayAgentTest {
         val answer = assertIs<AgentEvent.Answer>(events[1])
         assertEquals("Simons barn: Adam är 8 år (fyller 9), Elsa är 5 år (fyller 6).", answer.text)
         assertTrue(fakeEngine.lastSystemPrompt.orEmpty().contains("Swedish"))
+    }
+
+    @Test
+    fun agentDeletesMultiplePeopleAcrossRoundsAndCombinedName() = runTest {
+        val repository = DefaultBirthdayRepository(seedEntries = SampleBirthdays.defaultEntries())
+        val tools = provideAgentTools(repository, clock = fixedClock, timeZone = utcZone)
+
+        // Test 1: Model calls delete_person sequentially across 2 rounds
+        var round = 0
+        val sequentialEngine = FakeLlmEngine { _ ->
+            round++
+            when (round) {
+                1 -> LlmResponse(
+                    text = "",
+                    toolCalls = listOf(ToolCall("delete_person", ToolArguments(mapOf("name" to "Bob"))))
+                )
+                2 -> LlmResponse(
+                    text = "",
+                    toolCalls = listOf(ToolCall("delete_person", ToolArguments(mapOf("name" to "Alice"))))
+                )
+                else -> LlmResponse(
+                    text = "Jag har tagit bort Bob och Alice.",
+                    toolCalls = emptyList()
+                )
+            }
+        }
+
+        val agent = BirthdayAgent(
+            engine = sequentialEngine,
+            tools = tools,
+            clock = fixedClock,
+            timeZone = utcZone
+        )
+
+        val events = agent.send("Ta bort Bob och Alice").toList()
+        assertEquals(3, events.size)
+        assertFalse(repository.getEntriesSnapshot().any { it.name == "Bob" || it.name == "Alice" })
+
+        // Test 2: Model passes "Adam och Elsa" in a single delete_person call
+        val combinedEngine = FakeLlmEngine { messages ->
+            when (messages.last()) {
+                is LlmMessage.User -> LlmResponse(
+                    text = "",
+                    toolCalls = listOf(
+                        ToolCall("delete_person", ToolArguments(mapOf("name" to "Adam och Elsa")))
+                    )
+                )
+                is LlmMessage.ToolResults -> LlmResponse(
+                    text = "Jag har tagit bort Adam och Elsa.",
+                    toolCalls = emptyList()
+                )
+            }
+        }
+        val agent2 = BirthdayAgent(
+            engine = combinedEngine,
+            tools = tools,
+            clock = fixedClock,
+            timeZone = utcZone
+        )
+        agent2.send("Ta bort Adam och Elsa").toList()
+        val simon = repository.getEntriesSnapshot().first { it.name == "Simon" }
+        assertTrue(simon.children.isEmpty())
     }
 
     @Test

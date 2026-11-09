@@ -52,7 +52,7 @@
     <string name="people_sync_nas">Synka med NAS</string>
     <string name="people_add_person">Lägg till person</string>
     <string name="people_empty_state">Inga födelsedagar ännu. Fråga bdai eller tryck på + för att lägga till någon!</string>
-    <string name="person_age_turning">%1$d år · Fyller %2$d år %3$s</string>
+    <string name="person_age_turning">%1$d år (fyller %2$d) · Född %3$s</string>
     <string name="person_days_today">🎂 Idag!</string>
     <string name="person_days_tomorrow">Imorgon</string>
     <string name="person_days_until">Om %1$d d</string>

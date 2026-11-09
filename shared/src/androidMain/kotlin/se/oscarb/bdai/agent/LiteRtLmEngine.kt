@@ -1,6 +1,5 @@
 package se.oscarb.bdai.agent
 
-import android.os.Build
 import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.Content
 import com.google.ai.edge.litertlm.Contents
@@ -10,6 +9,7 @@ import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.OpenApiTool
+import com.google.ai.edge.litertlm.SamplerConfig
 import com.google.ai.edge.litertlm.tool
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -34,14 +34,9 @@ class LiteRtLmEngine : LlmEngine {
     override suspend fun load(modelPath: String, cacheDir: String) = mutex.withLock {
         if (engine != null) return@withLock
         engine = withContext(Dispatchers.Default) {
-            // The emulator's GPU initializes fine but has no OpenCL, so generation would fail later.
-            if (isEmulator()) {
-                createEngine(modelPath, cacheDir, Backend.CPU()).getOrThrow()
-            } else {
-                createEngine(modelPath, cacheDir, Backend.GPU())
-                    .recoverCatching { createEngine(modelPath, cacheDir, Backend.CPU()).getOrThrow() }
-                    .getOrThrow()
-            }
+            // Use Backend.CPU() for reliable, deterministic token generation across devices
+            // (Backend.GPU() on Tensor G5 / PowerVR corrupts subword/digit logits in OpenCL).
+            createEngine(modelPath, cacheDir, Backend.CPU()).getOrThrow()
         }
     }
 
@@ -55,6 +50,11 @@ class LiteRtLmEngine : LlmEngine {
                 ConversationConfig(
                     systemInstruction = Contents.of(systemPrompt),
                     tools = tools.map { tool(DescriptionOnlyTool(it)) },
+                    samplerConfig = SamplerConfig(
+                        topK = 1,
+                        topP = 1.0,
+                        temperature = 0.0
+                    ),
                     automaticToolCalling = false
                 )
             )
@@ -74,8 +74,6 @@ class LiteRtLmEngine : LlmEngine {
             ).apply { initialize() }
         }
     }
-
-    private fun isEmulator(): Boolean = Build.HARDWARE == "ranchu" || Build.HARDWARE == "goldfish"
 
     private companion object {
         const val MAX_NUM_TOKENS = 4096

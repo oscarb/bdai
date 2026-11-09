@@ -1,5 +1,6 @@
 package se.oscarb.bdai.agent.tools
 
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import se.oscarb.bdai.agent.domain.AgentTool
@@ -18,14 +19,14 @@ class DeletePersonTool(
     override val name = "delete_person"
 
     override val description =
-        "Deletes a person, partner, or child by name. Supports optional birthday_hint or parent_name " +
+        "Deletes one or more people, partners, or children by name. Supports optional birthday_hint or parent_name " +
             "to disambiguate when two people share the same name."
 
     override val parameters = listOf(
         ToolParameter(
             name = "name",
             type = ToolParameter.Type.STRING,
-            description = "The name of the person or child to delete."
+            description = "The name of the person or child to delete (or multiple names separated by ',' or 'och' / 'and')."
         ),
         ToolParameter(
             name = "birthday_hint",
@@ -42,25 +43,98 @@ class DeletePersonTool(
     )
 
     override suspend fun execute(arguments: ToolArguments): Map<String, Any?> {
-        val targetName = arguments.string("name")
+        val rawNameArg = arguments.string("name")
             ?: throw ToolException("The 'name' parameter is required.")
         val rawBirthdayHint = arguments.string("birthday_hint")
-        val parentNameHint = arguments.string("parent_name")?.let { stripPossessive(it).ifEmpty { it.trim() } }
+        val rawParentName = arguments.string("parent_name")?.trim()?.takeIf { it.isNotEmpty() }
 
         val today = clock.todayIn(timeZone())
         val normalizedBirthdayHint = rawBirthdayHint?.let { hint ->
             DateExpressions.parseBirthday(hint, today)?.toString() ?: hint.trim()
         }
 
+        // If the user/model passed multiple names in a single call (e.g. "Anna och Erik" or "Anna, Erik"),
+        // split and delete each one unless an exact single person has that literal compound name.
+        val currentEntries = repository.getEntriesSnapshot()
+        val hasExactLiteralMatch = currentEntries.any { entry ->
+            entry.name.equals(rawNameArg.trim(), ignoreCase = true) ||
+                entry.partner?.name.equals(rawNameArg.trim(), ignoreCase = true) ||
+                entry.children.any { it.name.equals(rawNameArg.trim(), ignoreCase = true) }
+        }
+
+        val targetNames = if (hasExactLiteralMatch) {
+            listOf(rawNameArg.trim())
+        } else {
+            rawNameArg
+                .split(MULTI_NAME_SPLIT_REGEX)
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .ifEmpty { listOf(rawNameArg.trim()) }
+        }
+
+        if (targetNames.size == 1) {
+            val targetName = targetNames.single()
+            deleteSingle(
+                targetName = targetName,
+                normalizedBirthdayHint = normalizedBirthdayHint,
+                rawParentName = rawParentName,
+                today = today
+            )
+            return mapOf(
+                "status" to "deleted",
+                "deleted_name" to targetName
+            )
+        }
+
+        val deletedNames = mutableListOf<String>()
+        val errors = mutableListOf<String>()
+        for (targetName in targetNames) {
+            try {
+                deleteSingle(
+                    targetName = targetName,
+                    normalizedBirthdayHint = normalizedBirthdayHint,
+                    rawParentName = rawParentName,
+                    today = today
+                )
+                deletedNames += targetName
+            } catch (e: ToolException) {
+                errors += e.message ?: "Could not delete '$targetName'."
+            }
+        }
+
+        if (deletedNames.isEmpty() && errors.isNotEmpty()) {
+            throw ToolException(errors.joinToString(" "))
+        }
+
+        return buildMap {
+            put("status", "deleted")
+            put("deleted_name", deletedNames.joinToString(", "))
+            put("deleted_names", deletedNames)
+            if (errors.isNotEmpty()) {
+                put("warnings", errors)
+            }
+        }
+    }
+
+    private suspend fun deleteSingle(
+        targetName: String,
+        normalizedBirthdayHint: String?,
+        rawParentName: String?,
+        today: LocalDate
+    ) {
+        val strippedParentName = rawParentName?.let { stripPossessive(it).ifEmpty { it } }
         val entries = repository.getEntriesSnapshot()
         val matches = mutableListOf<String>()
+        var matchedActualParentName: String? = rawParentName
 
         for (entry in entries) {
-            val parentMatchesHint = parentNameHint == null ||
-                entry.name.equals(parentNameHint, ignoreCase = true) ||
-                entry.partner?.name?.equals(parentNameHint, ignoreCase = true) == true
+            val parentMatchesHint = rawParentName == null ||
+                entry.name.equals(rawParentName, ignoreCase = true) ||
+                entry.name.equals(strippedParentName, ignoreCase = true) ||
+                entry.partner?.name?.equals(rawParentName, ignoreCase = true) == true ||
+                entry.partner?.name?.equals(strippedParentName, ignoreCase = true) == true
 
-            if (parentNameHint == null && entry.name.equals(targetName, ignoreCase = true)) {
+            if (rawParentName == null && entry.name.equals(targetName, ignoreCase = true)) {
                 val bdayMatches = normalizedBirthdayHint == null ||
                     entry.birthday == normalizedBirthdayHint ||
                     entry.birthday?.startsWith(normalizedBirthdayHint) == true
@@ -71,7 +145,7 @@ class DeletePersonTool(
             }
 
             val partner = entry.partner
-            if (parentNameHint == null && partner != null && partner.name.equals(targetName, ignoreCase = true)) {
+            if (rawParentName == null && partner != null && partner.name.equals(targetName, ignoreCase = true)) {
                 val bdayMatches = normalizedBirthdayHint == null ||
                     partner.birthday == normalizedBirthdayHint ||
                     partner.birthday?.startsWith(normalizedBirthdayHint) == true
@@ -87,6 +161,7 @@ class DeletePersonTool(
                             child.birthday == normalizedBirthdayHint ||
                             child.birthday.startsWith(normalizedBirthdayHint)
                         if (bdayMatches) {
+                            matchedActualParentName = entry.name
                             matches += "${child.name} (child of ${entry.name}, birthday: ${child.birthday})"
                         }
                     }
@@ -108,16 +183,15 @@ class DeletePersonTool(
         val deleted = repository.deletePersonOrChild(
             name = targetName,
             birthdayHint = normalizedBirthdayHint,
-            parentNameHint = parentNameHint
+            parentNameHint = if (rawParentName != null) matchedActualParentName else null
         )
 
         if (!deleted) {
             throw ToolException("Could not delete '$targetName'.")
         }
+    }
 
-        return mapOf(
-            "status" to "deleted",
-            "deleted_name" to targetName
-        )
+    private companion object {
+        val MULTI_NAME_SPLIT_REGEX = Regex("""\s*(?:,|&|\boch\b|\band\b)\s*""", RegexOption.IGNORE_CASE)
     }
 }

@@ -32,12 +32,18 @@ class AddChildTool(
         ToolParameter(
             name = "child_birthday",
             type = ToolParameter.Type.STRING,
-            description = "The child's birthday in YYYY-MM-DD format or natural date expression (e.g. ${DateExpressions.DATE_EXAMPLES})."
+            description = "The child's birthday or natural date/age phrase (e.g. '26 oktober', 'hon fyllde 1 den 26 oktober', '2025-10-26', 'idag'). Prefer passing the user's natural wording instead of doing mental year math."
         ),
         ToolParameter(
             name = "parent_name",
             type = ToolParameter.Type.STRING,
             description = "The name of the parent (e.g. 'Simon', 'Alex')."
+        ),
+        ToolParameter(
+            name = "age",
+            type = ToolParameter.Type.INT,
+            description = "Optional age in years if the user mentioned how old the child is or what age they turned (e.g. 'hon fyllde 1 den 26 oktober' -> age=1). Pass age here so the app subtracts the right number of years.",
+            isRequired = false
         ),
         ToolParameter(
             name = "parent_birthday_hint",
@@ -60,14 +66,23 @@ class AddChildTool(
             ?: throw ToolException("The 'child_birthday' parameter is required.")
         val rawParentName = arguments.string("parent_name")
             ?: throw ToolException("The 'parent_name' parameter is required.")
+        val ageHint = arguments.int("age")
+            ?: arguments.int("child_age")
+            ?: arguments.string("age")?.toIntOrNull()
         val rawHint = arguments.string("parent_birthday_hint")
         val friendOf = arguments.string("friend_of")
 
         val today = clock.todayIn(timeZone())
-        val childBirthday = DateExpressions.parseBirthday(rawChildBirthday, today)
-            ?: throw ToolException(unknownDateMessage(rawChildBirthday))
-
         val allEntries = repository.getEntriesSnapshot()
+        val existingChildBirthday = findExistingBirthday(allEntries, childName, parentNameHint = rawParentName)
+            ?: findExistingBirthday(allEntries, childName)
+        val childBirthday = DateExpressions.parseBirthday(
+            input = rawChildBirthday,
+            today = today,
+            ageHint = ageHint,
+            existingBirthday = existingChildBirthday
+        ) ?: throw ToolException(unknownDateMessage(rawChildBirthday))
+
         val matchingParents = findMatchingParents(allEntries, rawParentName)
 
         var resolvedHint = rawHint?.let { hint ->
@@ -90,7 +105,7 @@ class AddChildTool(
         val effectiveParentName = if (matchingParents.size == 1) {
             matchingParents.single().name
         } else {
-            stripPossessive(rawParentName).ifEmpty { rawParentName.trim() }
+            stripApostrophePossessive(rawParentName).ifEmpty { rawParentName.trim() }
         }
 
         val updatedParent = repository.addOrUpdateChild(
@@ -101,12 +116,19 @@ class AddChildTool(
             friendOfIfNewParent = friendOf
         )
 
-        return mapOf(
-            "status" to "saved",
-            "child_name" to childName.trim(),
-            "child_birthday" to childBirthday.toString(),
-            "family" to updatedParent.toFamilyMap(today)
-        )
+        val familyMap = updatedParent.toFamilyMap(today)
+        val savedChildMap = (familyMap["children"] as? List<*>)
+            ?.mapNotNull { it as? Map<*, *> }
+            ?.firstOrNull { (it["name"] as? String).equals(childName.trim(), ignoreCase = true) }
+
+        return buildMap {
+            put("status", "saved")
+            put("child_name", childName.trim())
+            put("child_birthday", childBirthday.toString())
+            savedChildMap?.get("info_sv")?.let { put("summary_sv", it) }
+            savedChildMap?.get("info_en")?.let { put("summary_en", it) }
+            put("family", familyMap)
+        }
     }
 
     private fun findMatchingParents(entries: List<PersonEntry>, rawParentName: String): List<PersonEntry> {

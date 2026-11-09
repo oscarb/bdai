@@ -52,7 +52,7 @@
     <string name="people_sync_nas">Sync with NAS</string>
     <string name="people_add_person">Add person</string>
     <string name="people_empty_state">No birthdays yet. Ask bdai or tap + to add someone!</string>
-    <string name="person_age_turning">%1$d yrs · Turns %2$d on %3$s</string>
+    <string name="person_age_turning">%1$d yrs (turns %2$d) · Born %3$s</string>
     <string name="person_days_today">🎂 Today!</string>
     <string name="person_days_tomorrow">Tomorrow</string>
     <string name="person_days_until">In %1$d d</string>

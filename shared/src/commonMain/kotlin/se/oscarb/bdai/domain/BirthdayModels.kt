@@ -176,6 +176,23 @@ data class FlatBirthdayPerson(
 )
 
 /**
+ * Voice recognition language preference.
+ */
+@Serializable
+enum class VoiceLanguage(val id: String) {
+    AUTO("auto"),
+    SWEDISH("sv"),
+    ENGLISH("en");
+
+    val languageTag: String?
+        get() = when (this) {
+            AUTO -> null
+            SWEDISH -> "sv-SE"
+            ENGLISH -> "en-US"
+        }
+}
+
+/**
  * Settings stored locally on the device.
  */
 @Serializable
@@ -184,8 +201,10 @@ data class BdaiSettings(
     val notificationsEnabled: Boolean = true,
     val notifyDaysBefore: Boolean = true,
     val lastSyncEpochMillis: Long? = null,
-    val hasPendingLocalChanges: Boolean = false
+    val hasPendingLocalChanges: Boolean = false,
+    val voiceLanguage: VoiceLanguage = VoiceLanguage.AUTO
 )
+
 
 sealed interface SyncResult {
     data class Success(val count: Int) : SyncResult

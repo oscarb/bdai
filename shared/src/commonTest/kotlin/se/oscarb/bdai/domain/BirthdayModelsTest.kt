@@ -119,4 +119,30 @@ class BirthdayModelsTest {
         val serialized = BirthdayYamlFormat.serialize(parsed)
         assertEquals(sampleYaml, serialized)
     }
+
+    @Test
+    fun voiceLanguagePropertiesAndDefaults() {
+        assertEquals(null, VoiceLanguage.AUTO.languageTag)
+        assertEquals("sv-SE", VoiceLanguage.SWEDISH.languageTag)
+        assertEquals("en-US", VoiceLanguage.ENGLISH.languageTag)
+
+        val defaultSettings = BdaiSettings()
+        assertEquals(VoiceLanguage.AUTO, defaultSettings.voiceLanguage)
+    }
+
+    @Test
+    fun bdaiSettingsSerializationWithVoiceLanguageAndBackwardsCompatibility() {
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+
+        // Test explicit serialization of Swedish voice language
+        val swedishSettings = BdaiSettings(voiceLanguage = VoiceLanguage.SWEDISH)
+        val encoded = json.encodeToString(BdaiSettings.serializer(), swedishSettings)
+        val decoded = json.decodeFromString(BdaiSettings.serializer(), encoded)
+        assertEquals(VoiceLanguage.SWEDISH, decoded.voiceLanguage)
+
+        // Test backwards compatibility with legacy JSON payload missing voiceLanguage
+        val legacyJson = """{"nasUrl":"http://nas/api.php","notificationsEnabled":true,"notifyDaysBefore":true}"""
+        val legacyDecoded = json.decodeFromString(BdaiSettings.serializer(), legacyJson)
+        assertEquals(VoiceLanguage.AUTO, legacyDecoded.voiceLanguage)
+    }
 }

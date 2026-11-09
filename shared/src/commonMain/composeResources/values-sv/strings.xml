@@ -24,6 +24,13 @@
 
     <string name="chat_input_placeholder">Fråga eller säg något till bdai…</string>
     <string name="voice_listening_placeholder">Lyssnar… prata nu</string>
+    <string name="voice_listening_auto">Lyssnar… prata på svenska eller engelska</string>
+    <string name="voice_listening_sv">Lyssnar… prata på svenska</string>
+    <string name="voice_listening_en">Lyssnar… prata på engelska</string>
+    <string name="voice_lang_auto">Svenska och engelska</string>
+    <string name="voice_lang_sv">Svenska</string>
+    <string name="voice_lang_en">Engelska</string>
+    <string name="cd_voice_language">Röstspråk: %1$s. Tryck för att byta.</string>
     <string name="voice_permission_denied">Mikrofonbehörighet krävs för röstinmatning.</string>
     <string name="cd_voice_input">Röstinmatning</string>
     <string name="cd_stop_listening">Sluta lyssna</string>
@@ -84,6 +91,11 @@
     <string name="settings_notifications_enable">Push-notiser för födelsedagar</string>
     <string name="settings_notifications_7days">Påminn även 7 dagar innan</string>
     <string name="settings_notifications_test">Testa födelsedagsnotis nu</string>
+    <string name="settings_voice_section">Röstinmatning</string>
+    <string name="settings_voice_language_label">Språk för taligenkänning</string>
+    <string name="settings_voice_lang_auto">Automatiskt (svenska &amp; engelska)</string>
+    <string name="settings_voice_lang_sv">Endast svenska</string>
+    <string name="settings_voice_lang_en">Endast engelska</string>
     <string name="settings_model_section">Lokal AI-modell (Gemma 4 E2B)</string>
     <string name="settings_model_ready">Redo · Körs lokalt på enheten</string>
     <string name="settings_model_not_downloaded">Inte nedladdad ännu</string>

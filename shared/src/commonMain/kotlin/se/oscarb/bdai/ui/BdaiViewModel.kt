@@ -18,6 +18,7 @@ import se.oscarb.bdai.agent.domain.AgentEvent
 import se.oscarb.bdai.agent.domain.BirthdayAgentService
 import se.oscarb.bdai.domain.BirthdayRepository
 import se.oscarb.bdai.domain.SyncResult
+import se.oscarb.bdai.domain.VoiceLanguage
 import se.oscarb.bdai.domain.flattenBirthdays
 import se.oscarb.bdai.notifications.BirthdayNotificationScheduler
 import se.oscarb.bdai.notifications.currentLocalDate
@@ -110,10 +111,25 @@ class BdaiViewModel(
                 state.value.input.setTextAndPlaceCursorAtEnd(action.text)
             }
             BdaiAction.OnStartVoice -> {
-                voiceRecognizer.startListening()
+                voiceRecognizer.startListening(state.value.settings.voiceLanguage.languageTag)
             }
             BdaiAction.OnStopVoice -> {
                 voiceRecognizer.stopListening()
+            }
+            is BdaiAction.OnSetVoiceLanguage -> {
+                viewModelScope.launch {
+                    repository.updateSettings { it.copy(voiceLanguage = action.language) }
+                }
+            }
+            BdaiAction.OnCycleVoiceLanguage -> {
+                val nextLanguage = when (state.value.settings.voiceLanguage) {
+                    VoiceLanguage.AUTO -> VoiceLanguage.SWEDISH
+                    VoiceLanguage.SWEDISH -> VoiceLanguage.ENGLISH
+                    VoiceLanguage.ENGLISH -> VoiceLanguage.AUTO
+                }
+                viewModelScope.launch {
+                    repository.updateSettings { it.copy(voiceLanguage = nextLanguage) }
+                }
             }
             BdaiAction.OnDownloadModelClick -> {
                 agentService.startDownloadModel()

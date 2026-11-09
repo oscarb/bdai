@@ -24,6 +24,13 @@
 
     <string name="chat_input_placeholder">Ask or tell bdai…</string>
     <string name="voice_listening_placeholder">Listening… speak now</string>
+    <string name="voice_listening_auto">Listening… speak in Swedish or English</string>
+    <string name="voice_listening_sv">Listening… speak in Swedish</string>
+    <string name="voice_listening_en">Listening… speak in English</string>
+    <string name="voice_lang_auto">Swedish &amp; English</string>
+    <string name="voice_lang_sv">Swedish</string>
+    <string name="voice_lang_en">English</string>
+    <string name="cd_voice_language">Voice language: %1$s. Tap to cycle.</string>
     <string name="voice_permission_denied">Microphone permission is required for voice input.</string>
     <string name="cd_voice_input">Voice input</string>
     <string name="cd_stop_listening">Stop listening</string>
@@ -84,6 +91,11 @@
     <string name="settings_notifications_enable">Birthday push notifications</string>
     <string name="settings_notifications_7days">Also notify 7 days before</string>
     <string name="settings_notifications_test">Check &amp; test notifications now</string>
+    <string name="settings_voice_section">Voice Input</string>
+    <string name="settings_voice_language_label">Speech recognition language</string>
+    <string name="settings_voice_lang_auto">Auto (Swedish &amp; English)</string>
+    <string name="settings_voice_lang_sv">Swedish only</string>
+    <string name="settings_voice_lang_en">English only</string>
     <string name="settings_model_section">On-Device AI Model (Gemma 4 E2B)</string>
     <string name="settings_model_ready">Ready · Running on-device</string>
     <string name="settings_model_not_downloaded">Not downloaded yet</string>

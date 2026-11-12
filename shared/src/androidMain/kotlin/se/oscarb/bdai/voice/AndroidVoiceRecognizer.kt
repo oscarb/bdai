@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -139,12 +140,42 @@ class AndroidVoiceRecognizer(
                     it.setRecognitionListener(listener)
                     speechRecognizer = it
                 }
-                val localeTag = languageTag?.takeIf { it.isNotBlank() } ?: Locale.getDefault().toLanguageTag()
+                val defaultLocaleTag = Locale.getDefault().toLanguageTag()
+                val primaryLocaleTag = when {
+                    !languageTag.isNullOrBlank() -> languageTag
+                    defaultLocaleTag.startsWith("sv", ignoreCase = true) -> defaultLocaleTag
+                    else -> "sv-SE"
+                }
                 val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                     putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
                     putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, localeTag)
-                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, localeTag)
+                    putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, primaryLocaleTag)
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, primaryLocaleTag)
+
+                    // In AUTO mode, enable bilingual recognition (Swedish and English)
+                    if (languageTag.isNullOrBlank()) {
+                        putStringArrayListExtra(
+                            "android.speech.extra.EXTRA_ADDITIONAL_LANGUAGES",
+                            arrayListOf("sv-SE", "en-US")
+                        )
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_DETECTION, true)
+                            putStringArrayListExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_DETECTION_ALLOWED_LANGUAGES,
+                                arrayListOf("sv-SE", "en-US")
+                            )
+                            putExtra(
+                                RecognizerIntent.EXTRA_ENABLE_LANGUAGE_SWITCH,
+                                RecognizerIntent.LANGUAGE_SWITCH_BALANCED
+                            )
+                            putStringArrayListExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_SWITCH_ALLOWED_LANGUAGES,
+                                arrayListOf("sv-SE", "en-US")
+                            )
+                        }
+                    }
                 }
                 _state.value = VoiceState.Listening
                 recognizer.startListening(intent)

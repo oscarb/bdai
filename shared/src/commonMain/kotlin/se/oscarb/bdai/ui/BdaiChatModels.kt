@@ -6,7 +6,9 @@ import se.oscarb.bdai.agent.domain.ModelState
 import se.oscarb.bdai.domain.BdaiSettings
 import se.oscarb.bdai.domain.FlatBirthdayPerson
 import se.oscarb.bdai.domain.PersonEntry
+import se.oscarb.bdai.domain.VoiceLanguage
 import se.oscarb.bdai.voice.VoiceState
+
 
 sealed interface ChatMessageUi {
     val id: String
@@ -51,6 +53,8 @@ sealed interface BdaiAction {
     data class OnPrefillInput(val text: String) : BdaiAction
     data object OnStartVoice : BdaiAction
     data object OnStopVoice : BdaiAction
+    data class OnSetVoiceLanguage(val language: VoiceLanguage) : BdaiAction
+    data object OnCycleVoiceLanguage : BdaiAction
     data object OnDownloadModelClick : BdaiAction
     data object OnRetryLoadModelClick : BdaiAction
     data object OnNewChatClick : BdaiAction

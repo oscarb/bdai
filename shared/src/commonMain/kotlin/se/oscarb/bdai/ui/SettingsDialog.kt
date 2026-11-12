@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -53,9 +54,15 @@ import bdai.shared.generated.resources.settings_sync_error
 import bdai.shared.generated.resources.settings_sync_success
 import bdai.shared.generated.resources.settings_sync_to_nas
 import bdai.shared.generated.resources.settings_title
+import bdai.shared.generated.resources.settings_voice_lang_auto
+import bdai.shared.generated.resources.settings_voice_lang_en
+import bdai.shared.generated.resources.settings_voice_lang_sv
+import bdai.shared.generated.resources.settings_voice_language_label
+import bdai.shared.generated.resources.settings_voice_section
 import org.jetbrains.compose.resources.stringResource
 import se.oscarb.bdai.agent.domain.ModelState
 import se.oscarb.bdai.core.designsystem.AppIcons
+import se.oscarb.bdai.domain.VoiceLanguage
 import se.oscarb.bdai.notifications.rememberLocalNetworkPermissionRequester
 import se.oscarb.bdai.notifications.rememberNotificationPermissionRequester
 
@@ -232,6 +239,60 @@ internal fun SettingsDialog(
                         )
                         Text(stringResource(Res.string.settings_notifications_test))
                     }
+                }
+
+                HorizontalDivider()
+
+                // Voice Input Section
+                Text(
+                    text = stringResource(Res.string.settings_voice_section),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = stringResource(Res.string.settings_voice_language_label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val currentLang = state.settings.voiceLanguage
+                    FilterChip(
+                        selected = currentLang == VoiceLanguage.AUTO,
+                        onClick = { onAction(BdaiAction.OnSetVoiceLanguage(VoiceLanguage.AUTO)) },
+                        label = {
+                            Text(
+                                text = "Auto",
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterChip(
+                        selected = currentLang == VoiceLanguage.SWEDISH,
+                        onClick = { onAction(BdaiAction.OnSetVoiceLanguage(VoiceLanguage.SWEDISH)) },
+                        label = {
+                            Text(
+                                text = "Svenska",
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterChip(
+                        selected = currentLang == VoiceLanguage.ENGLISH,
+                        onClick = { onAction(BdaiAction.OnSetVoiceLanguage(VoiceLanguage.ENGLISH)) },
+                        label = {
+                            Text(
+                                text = "English",
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 HorizontalDivider()

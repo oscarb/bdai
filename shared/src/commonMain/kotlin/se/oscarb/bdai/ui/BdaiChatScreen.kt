@@ -91,7 +91,10 @@ import bdai.shared.generated.resources.sync_status_synced
 import bdai.shared.generated.resources.upcoming_in_days_badge
 import bdai.shared.generated.resources.upcoming_soon_card_title
 import bdai.shared.generated.resources.upcoming_today_badge
+import bdai.shared.generated.resources.voice_listening_auto
+import bdai.shared.generated.resources.voice_listening_en
 import bdai.shared.generated.resources.voice_listening_placeholder
+import bdai.shared.generated.resources.voice_listening_sv
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -100,6 +103,7 @@ import se.oscarb.bdai.core.designsystem.AppIcons
 import se.oscarb.bdai.core.designsystem.AppTheme
 import se.oscarb.bdai.core.designsystem.GeminiSparkleBrush
 import se.oscarb.bdai.domain.FlatBirthdayPerson
+import se.oscarb.bdai.domain.VoiceLanguage
 import se.oscarb.bdai.voice.rememberMicPermissionRequester
 
 @Composable
@@ -155,6 +159,7 @@ fun BdaiChatScreen(
                     inputState = state.input,
                     isModelReady = state.isModelReady,
                     isListening = state.isListening,
+                    voiceLanguage = state.settings.voiceLanguage,
                     canSend = state.canSend,
                     onMicClick = {
                         if (state.isListening) {
@@ -162,6 +167,9 @@ fun BdaiChatScreen(
                         } else {
                             requestMicPermission()
                         }
+                    },
+                    onToggleVoiceLanguage = {
+                        onAction(BdaiAction.OnCycleVoiceLanguage)
                     },
                     onSendClick = { onAction(BdaiAction.OnSendClick) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
@@ -526,8 +534,10 @@ private fun GeminiChatInputBar(
     inputState: TextFieldState,
     isModelReady: Boolean,
     isListening: Boolean,
+    voiceLanguage: VoiceLanguage,
     canSend: Boolean,
     onMicClick: () -> Unit,
+    onToggleVoiceLanguage: () -> Unit,
     onSendClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -557,9 +567,14 @@ private fun GeminiChatInputBar(
                 state = inputState,
                 enabled = isModelReady,
                 placeholder = {
+                    val listeningRes = when (voiceLanguage) {
+                        VoiceLanguage.AUTO -> Res.string.voice_listening_auto
+                        VoiceLanguage.SWEDISH -> Res.string.voice_listening_sv
+                        VoiceLanguage.ENGLISH -> Res.string.voice_listening_en
+                    }
                     Text(
                         text = stringResource(
-                            if (isListening) Res.string.voice_listening_placeholder
+                            if (isListening) listeningRes
                             else Res.string.chat_input_placeholder
                         )
                     )
@@ -581,6 +596,39 @@ private fun GeminiChatInputBar(
                 onKeyboardAction = { onSendClick() },
                 modifier = Modifier.weight(1f)
             )
+
+            // Quick toggle chip for voice recognition language (SV · EN / SV / EN)
+            val voiceLangLabel = when (voiceLanguage) {
+                VoiceLanguage.AUTO -> "SV · EN"
+                VoiceLanguage.SWEDISH -> "SV"
+                VoiceLanguage.ENGLISH -> "EN"
+            }
+            Surface(
+                onClick = onToggleVoiceLanguage,
+                shape = CircleShape,
+                color = if (voiceLanguage != VoiceLanguage.AUTO) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainerHighest
+                },
+                contentColor = if (voiceLanguage != VoiceLanguage.AUTO) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                modifier = Modifier.height(36.dp)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text(
+                        text = voiceLangLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
 
             FilledTonalIconButton(
                 onClick = onMicClick,
